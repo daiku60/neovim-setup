@@ -41,4 +41,7 @@ return {
       require('colorizer').setup()
     end,
   },
+  {
+    'ThePrimeagen/vim-be-good',
+  },
 }
