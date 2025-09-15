@@ -75,3 +75,10 @@ local modes = { 'n', 'v', 'x' }
 for key, func in pairs(keymap) do
   vim.keymap.set(modes, key, func)
 end
+
+-- LSP to open a float window for diagnostics when cursor is held
+vim.api.nvim_create_autocmd('CursorHold', {
+  callback = function()
+    vim.diagnostic.open_float(nil, { focus = false })
+  end,
+})

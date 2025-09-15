@@ -34,8 +34,8 @@ return {
       enable_diagnostics = true,
       -- enable_normal_mode_for_inputs = false,                             -- Enable normal mode for input dialogs.
       open_files_do_not_replace_types = { 'terminal', 'trouble', 'qf' }, -- when opening files, do not use windows containing these filetypes or buftypes
-      sort_case_insensitive = false, -- used when sorting files and directories in the tree
-      sort_function = nil, -- use a custom function for sorting files and directories in the tree
+      sort_case_insensitive = false,                                     -- used when sorting files and directories in the tree
+      sort_function = nil,                                               -- use a custom function for sorting files and directories in the tree
       -- sort_function = function (a,b)
       --       if a.type == b.type then
       --           return a.path > b.path
@@ -214,17 +214,17 @@ return {
           },
         },
         follow_current_file = {
-          enabled = false, -- This will find and focus the file in the active buffer every time
+          enabled = false,                      -- This will find and focus the file in the active buffer every time
           --               -- the current file is changed while the tree is open.
-          leave_dirs_open = false, -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
+          leave_dirs_open = false,              -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
         },
-        group_empty_dirs = false, -- when true, empty folders will be grouped together
+        group_empty_dirs = false,               -- when true, empty folders will be grouped together
         hijack_netrw_behavior = 'open_default', -- netrw disabled, opening a directory opens neo-tree
         -- in whatever position is specified in window.position
         -- "open_current",  -- netrw disabled, opening a directory opens within the
         -- window like netrw would, regardless of window.position
         -- "disabled",    -- netrw left alone, neo-tree does not handle opening dirs
-        use_libuv_file_watcher = false, -- This will use the OS level file watchers to detect changes
+        use_libuv_file_watcher = true, -- This will use the OS level file watchers to detect changes
         -- instead of relying on nvim autocmd events.
         window = {
           mappings = {
@@ -247,7 +247,7 @@ return {
             ['on'] = { 'order_by_name', nowait = false },
             ['os'] = { 'order_by_size', nowait = false },
             ['ot'] = { 'order_by_type', nowait = false },
-            ['R'] = function(state)
+            ['<C-r>'] = function(state)
               local node = state.tree:get_node()
               local path = node:get_id()
               local parent = vim.fn.fnamemodify(path, ':h')
@@ -288,11 +288,11 @@ return {
       },
       buffers = {
         follow_current_file = {
-          enabled = true, -- This will find and focus the file in the active buffer every time
+          enabled = true,          -- This will find and focus the file in the active buffer every time
           --              -- the current file is changed while the tree is open.
           leave_dirs_open = false, -- `false` closes auto expanded dirs, such as with `:Neotree reveal`
         },
-        group_empty_dirs = true, -- when true, empty folders will be grouped together
+        group_empty_dirs = true,   -- when true, empty folders will be grouped together
         show_unloaded = true,
         window = {
           mappings = {
@@ -334,6 +334,6 @@ return {
 
     vim.cmd [[nnoremap \ :Neotree reveal<cr>]]
     vim.keymap.set('n', '<leader>e', ':Neotree toggle position=left<CR>', { noremap = true, silent = true }) -- focus file explorer
-    vim.keymap.set('n', '<leader>ngs', ':Neotree float git_status<CR>', { noremap = true, silent = true }) -- open git status window
+    vim.keymap.set('n', '<leader>ngs', ':Neotree float git_status<CR>', { noremap = true, silent = true })   -- open git status window
   end,
 }
