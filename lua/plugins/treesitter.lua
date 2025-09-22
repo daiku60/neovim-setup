@@ -1,8 +1,21 @@
-return { -- Highlight, edit, and navigate code
+return {
   'nvim-treesitter/nvim-treesitter',
   build = ':TSUpdate',
-  main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-  -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+  dependencies = {
+    {
+      'windwp/nvim-ts-autotag',
+      config = function()
+        require('nvim-ts-autotag').setup {
+          opts = {
+            enable_close = true, -- auto close tags
+            enable_rename = true, -- auto rename tags
+            enable_close_on_slash = false, -- </ auto close
+          },
+        }
+      end,
+    },
+  },
+  main = 'nvim-treesitter.configs',
   opts = {
     ensure_installed = {
       'lua',
@@ -31,35 +44,13 @@ return { -- Highlight, edit, and navigate code
       'tsx',
       'css',
       'html',
-    }, -- Autoinstall languages that are not installed
+    },
     auto_install = true,
     highlight = {
       enable = true,
-      -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-      --  If you are experiencing weird indenting issues, add the language to
-      --  the list of additional_vim_regex_highlighting and disabled languages for indent.
       additional_vim_regex_highlighting = { 'ruby' },
     },
     indent = { enable = true, disable = { 'ruby' } },
+    -- 🚫 remove "autotag = ..." from here!
   },
-  -- There are additional nvim-treesitter modules that you can use to interact
-  -- with nvim-treesitter. You should go explore a few and see what interests you:
-  --
-  --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-  --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-  --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-  -- Treesitter Context
-  -- {
-  --   'nvim-treesitter/nvim-treesitter-context',
-  --   opts = {
-  --     enable = true,
-  --     line_numbers = false, -- 👈 turn this off, avoids broken numbering
-  --     max_lines = 3, -- 👈 cap context height (try 3–5)
-  --     multiline_threshold = 4, -- 👈 don’t expand big JSX blocks fully
-  --     trim_scope = 'outer', -- keep only outermost scope
-  --     mode = 'cursor', -- calculate context from cursor
-  --     separator = '─', -- optional visual separator
-  --     zindex = 20,
-  --   },
-  -- },
 }
