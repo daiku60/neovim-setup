@@ -31,6 +31,7 @@ require('lazy').setup {
   require 'plugins.debug',
   require 'plugins.lazygit',
   require 'plugins.neoscroll',
+  require 'plugins.obsidian',
 }
 
 vim.env.XDG_CONFIG_HOME = vim.fn.expand '$HOME/.config'
