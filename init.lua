@@ -79,7 +79,11 @@ end
 
 -- LSP to open a float window for diagnostics when cursor is held
 vim.api.nvim_create_autocmd('CursorHold', {
+
+-- Set conceallevel for Obdisian (only in markdown files)
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'markdown',
   callback = function()
-    vim.diagnostic.open_float(nil, { focus = false })
+    vim.opt.conceallevel = 2
   end,
 })
