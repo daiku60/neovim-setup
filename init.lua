@@ -77,8 +77,18 @@ for key, func in pairs(keymap) do
   vim.keymap.set(modes, key, func)
 end
 
--- LSP to open a float window for diagnostics when cursor is held
-vim.api.nvim_create_autocmd('CursorHold', {
+vim.keymap.set('n', '<esc>', function()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    if vim.api.nvim_win_get_config(win).relative ~= '' then
+      vim.api.nvim_win_close(win, true)
+    end
+  end
+end, { desc = 'close floating windows' })
+
+-- Keymap to manually open a floating diagnostic window
+vim.keymap.set('n', '<leader>d', function()
+  vim.diagnostic.open_float(nil, { focus = false })
+end, { desc = 'Show diagnostics in float' })
 
 -- Set conceallevel for Obdisian (only in markdown files)
 vim.api.nvim_create_autocmd('FileType', {
