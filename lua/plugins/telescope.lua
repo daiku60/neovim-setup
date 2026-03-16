@@ -49,6 +49,7 @@ return {
       -- You can put your default mappings / updates / etc. in here
       --  All the info you're looking for is in `:help telescope.setup()`
       defaults = {
+        file_ignore_patterns = { 'node_modules', '%.git', '%.venv', '%.next', '%.turbo' },
         mappings = {
           i = {
             ['<C-k>'] = require('telescope.actions').move_selection_previous, -- move to prev result
@@ -59,13 +60,25 @@ return {
       },
       pickers = {
         find_files = {
-          file_ignore_patterns = { 'node_modules', '%.git', '%.venv' },
+          file_ignore_patterns = { 'node_modules', '%.git', '%.venv', '%.next', '%.turbo' },
           hidden = true,
         },
         live_grep = {
-          file_ignore_patterns = { 'node_modules', '%.git', '%.venv' },
+          file_ignore_patterns = { 'node_modules', '%.git', '%.venv', '%.next', '%.turbo' },
           additional_args = function(_)
-            return { '--hidden' }
+            return {
+              '--hidden',
+              '--glob',
+              '!node_modules/**',
+              '--glob',
+              '!.git/**',
+              '--glob',
+              '!.venv/**',
+              '--glob',
+              '!.next/**',
+              '--glob',
+              '!.turbo/**',
+            }
           end,
         },
       },

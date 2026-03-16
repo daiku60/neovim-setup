@@ -36,6 +36,8 @@ require('lazy').setup {
 
 vim.env.XDG_CONFIG_HOME = vim.fn.expand '$HOME/.config'
 
+vim.env.NVIM = vim.v.servername
+
 -- require('nord').set()
 require('bamboo').load()
 
