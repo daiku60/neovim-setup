@@ -298,6 +298,9 @@ return {
     require('mason-lspconfig').setup {
       ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
       automatic_installation = false,
+      automatic_enable = {
+        exclude = { 'pylsp' },
+      },
       handlers = {
         function(server_name)
           local server = servers[server_name] or {}
@@ -309,5 +312,9 @@ return {
         end,
       },
     }
+
+    -- Mason can auto-enable installed servers through vim.lsp.enable().
+    -- Keep pylsp disabled so Python diagnostics come from Ruff only.
+    vim.lsp.enable('pylsp', false)
   end,
 }
