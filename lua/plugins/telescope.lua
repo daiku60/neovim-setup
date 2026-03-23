@@ -78,6 +78,8 @@ return {
               '!.next/**',
               '--glob',
               '!.turbo/**',
+              '--glob',
+              '!venv',
             }
           end,
         },
