@@ -10,7 +10,7 @@ return {
     'WhoIsSethDaniel/mason-tool-installer.nvim',
 
     -- Useful status updates for LSP.
-    { 'j-hui/fidget.nvim', opts = {} },
+    { 'j-hui/fidget.nvim',    opts = {} },
 
     -- Allows extra capabilities provided by blink.cmp
     'saghen/blink.cmp',
@@ -48,6 +48,31 @@ return {
     vim.api.nvim_create_autocmd('LspAttach', {
       group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
       callback = function(event)
+        -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
+        ---@param client vim.lsp.Client
+        ---@param method vim.lsp.protocol.Method
+        ---@param bufnr? integer some lsp support methods only in specific files
+        ---@return boolean
+        local function client_supports_method(client, method, bufnr)
+          if vim.fn.has 'nvim-0.11' == 1 then
+            return client:supports_method(method, bufnr)
+          else
+            return client.supports_method(method, { bufnr = bufnr })
+          end
+        end
+
+        ---@param method vim.lsp.protocol.Method
+        ---@return boolean
+        local function buffer_has_lsp_method(method)
+          for _, client in ipairs(vim.lsp.get_clients { bufnr = event.buf }) do
+            if client_supports_method(client, method, event.buf) then
+              return true
+            end
+          end
+
+          return false
+        end
+
         -- NOTE: Remember that Lua is a real programming language, and as such it is possible
         -- to define small helper and utility functions so you don't have to repeat yourself.
         --
@@ -76,7 +101,14 @@ return {
         -- Jump to the definition of the word under your cursor.
         --  This is where a variable was first declared, or where a function is defined, etc.
         --  To jump back, press <C-t>.
-        map('grd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+        map('grd', function()
+          if buffer_has_lsp_method(vim.lsp.protocol.Methods.textDocument_definition) then
+            require('telescope.builtin').lsp_definitions()
+            return
+          end
+
+          vim.notify('No attached LSP server supports go to definition for this buffer', vim.log.levels.WARN)
+        end, '[G]oto [D]efinition')
 
         -- WARN: This is not Goto Definition, this is Goto Declaration.
         --  For example, in C this would take you to the header.
@@ -95,25 +127,18 @@ return {
         --  the definition of its *type*, not where it was *defined*.
         map('grt', require('telescope.builtin').lsp_type_definitions, '[G]oto [T]ype Definition')
 
-        -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-        ---@param client vim.lsp.Client
-        ---@param method vim.lsp.protocol.Method
-        ---@param bufnr? integer some lsp support methods only in specific files
-        ---@return boolean
-        local function client_supports_method(client, method, bufnr)
-          if vim.fn.has 'nvim-0.11' == 1 then
-            return client:supports_method(method, bufnr)
-          else
-            return client.supports_method(method, { bufnr = bufnr })
-          end
-        end
-
         -- The following two autocommands are used to highlight references of the
         -- word under your cursor when your cursor rests there for a little while.
         --    See `:help CursorHold` for information about when this is executed
         --
         -- When you move your cursor, the highlights will be cleared (the second autocommand).
         local client = vim.lsp.get_client_by_id(event.data.client_id)
+        if client and client.name == 'pyright' then
+          local namespace = vim.lsp.diagnostic.get_namespace(client.id, false)
+          vim.diagnostic.enable(false, { bufnr = event.buf, ns_id = namespace })
+          vim.diagnostic.reset(namespace, event.buf)
+        end
+
         if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
           local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
           vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
@@ -196,18 +221,6 @@ return {
     local servers = {
       -- clangd = {},
       -- gopls = {},
-      pyright = {
-        settings = {
-          python = {
-            analysis = {
-              typeCheckingMode = 'off',
-              diagnosticMode = 'openFilesOnly',
-              reportMissingImports = 'none',
-              reportMissingModuleSource = 'none',
-            },
-          },
-        },
-      },
       -- rust_analyzer = {},
       -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
       --
@@ -232,6 +245,22 @@ return {
       eslint = {
         settings = {
           format = false,
+        },
+      },
+      pyright = {
+        handlers = {
+          ['textDocument/publishDiagnostics'] = function() end,
+        },
+        settings = {
+          pyright = {
+            disableOrganizeImports = true,
+            reportMissingImports = false,
+          },
+          python = {
+            analysis = {
+              ignore = { '*' },
+            },
+          },
         },
       },
       --
