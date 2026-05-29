@@ -91,11 +91,3 @@ end, { desc = 'close floating windows' })
 vim.keymap.set('n', '<leader>d', function()
   vim.diagnostic.open_float(nil, { focus = false })
 end, { desc = 'Show diagnostics in float' })
-
--- Set conceallevel for Obdisian (only in markdown files)
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = 'markdown',
-  callback = function()
-    vim.opt.conceallevel = 2
-  end,
-})
